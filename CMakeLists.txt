@@ -1,0 +1,30 @@
+# Copyright 2014 CNRS
+# Author: Andrea Del Prete
+#
+
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+
+SET(PROJECT_NAME ipoptEigWrap)
+SET(PROJECT_DESCRIPTION "Wrapper of ipopt for use with Eigen library")
+SET(PROJECT_URL "http://github.com/andreadelprete/ipoptEigWrap")
+
+SET(CXX_DISABLE_WERROR True)
+SET(CMAKE_VERBOSE_MAKEFILE true)
+
+project(${PROJECT_NAME})
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+find_package(IPOPT REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+file(GLOB ${PROJECT_NAME}_H    "include/*.hpp")
+file(GLOB ${PROJECT_NAME}_SRC  "src/*.cpp")
+
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
+INCLUDE_DIRECTORIES(${IPOPT_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
+
+add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_H} ${${PROJECT_NAME}_SRC})
+
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${IPOPT_LIBRARIES})
