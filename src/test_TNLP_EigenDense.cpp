@@ -3,17 +3,24 @@
 // Author: Andrea Del Prete     LAAS-CNRS    2014-06-24
 
 #include "IpIpoptApplication.hpp"
-#include "TNLP_EIgenDense.hpp"
+#include "TNLP_EIgenDenseExample.hpp"
+#include <hs071_nlp.hpp>
 
 #include <iostream>
 
 using namespace Ipopt;
 
+const bool TEST_EIGEN_WRAPPER = false;
+
 int main(int argv, char* argc[])
 {
   // Create a new instance of your nlp
   //  (use a SmartPtr, not raw)
-  SmartPtr<TNLP> mynlp = new TNLP_EigenDense();
+    SmartPtr<TNLP> mynlp;
+    if(TEST_EIGEN_WRAPPER)
+        mynlp = new TNLP_EigenDenseExample();
+    else
+        mynlp = new HS071_NLP();
 
   // Create a new instance of IpoptApplication
   //  (use a SmartPtr, not raw)

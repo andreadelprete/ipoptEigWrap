@@ -13,6 +13,11 @@ namespace Eigen
     typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixRXd;
 };
 
+typedef Eigen::Ref<Eigen::VectorXd> EVector;
+typedef const Eigen::Ref<const Eigen::VectorXd>& EConstVector;
+typedef Eigen::Map<Eigen::MatrixRXd> EMatrix;
+typedef const Eigen::Map<const Eigen::MatrixRXd> EConstMatrix;
+
 /**
  *
  */
@@ -29,40 +34,40 @@ public:
     //@{
     /** Method to return some info about the nlp */
     bool get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
-                              Ipopt::Index& nnz_h_lag, IndexStyleEnum& index_style);
-    virtual bool get_nlp_info(int n, int m) = 0;
+                      Ipopt::Index& nnz_h_lag, IndexStyleEnum& index_style);
+    virtual bool get_nlp_info(int &n, int &m) = 0;
     
     
     /** Method to return the bounds for my problem */
     bool get_bounds_info(Ipopt::Index n, Ipopt::Number* x_l, Ipopt::Number* x_u,
                                  Ipopt::Index m, Ipopt::Number* g_l, Ipopt::Number* g_u);
     /** Method to return the bounds for my problem */
-    virtual bool get_bounds_info(int n, Eigen::VectorXd &x_l, Eigen::VectorXd &x_u,
-                                 int m, Eigen::VectorXd &g_l, Eigen::VectorXd &g_u) = 0;
+    virtual bool get_bounds_info(EVector x_l, EVector x_u,
+                                 EVector g_l, EVector g_u) = 0;
     
     /** Method to return the starting point for the algorithm */
     bool get_starting_point(Ipopt::Index n, bool init_x, Ipopt::Number* x,
                             bool init_z, Ipopt::Number* z_L, Ipopt::Number* z_U,
                             Ipopt::Index m, bool init_lambda, Ipopt::Number* lambda);
     /** Method to return the starting point for the algorithm */
-    virtual bool get_starting_point(int n, bool init_x, Eigen::VectorXd &x,
-                                    bool init_z, Eigen::VectorXd &z_L, Eigen::VectorXd &z_U,
-                                    int m, bool init_lambda, Eigen::VectorXd &lambda) = 0;
+    virtual bool get_starting_point(bool init_x, EVector x,
+                                    bool init_z, EVector z_L, EVector z_U,
+                                    bool init_lambda, EVector lambda) = 0;
     
     /** Method to return the objective value */
     bool eval_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x, Ipopt::Number& obj_value);
     /** Method to return the objective value */
-    virtual bool eval_f(int n, const Eigen::VectorXd &x, bool new_x, double &obj_value) = 0;
+    virtual bool eval_f(EConstVector x, bool new_x, double &obj_value) = 0;
     
     /** Method to return the gradient of the objective */
     bool eval_grad_f(Ipopt::Index n, const Ipopt::Number* x, bool new_x, Ipopt::Number* grad_f);
     /** Method to return the gradient of the objective */
-    virtual bool eval_grad_f(int n, const Eigen::VectorXd &x, bool new_x, Eigen::VectorXd &grad_f) = 0;
+    virtual bool eval_grad_f(EConstVector x, bool new_x, EVector grad_f) = 0;
     
     /** Method to return the constraint residuals */
     bool eval_g(Ipopt::Index n, const Ipopt::Number* x, bool new_x, Ipopt::Index m, Ipopt::Number* g);
     /** Method to return the constraint residuals */
-    virtual bool eval_g(int n, const Eigen::VectorXd &x, bool new_x, int m, Eigen::VectorXd &g) = 0;
+    virtual bool eval_g(EConstVector x, bool new_x, EVector g) = 0;
     
     /** Method to return:
      *   1) The structure of the jacobian (if "values" is NULL)
@@ -72,8 +77,7 @@ public:
                     Ipopt::Index m, Ipopt::Index nele_jac, Ipopt::Index* iRow, Ipopt::Index *jCol,
                     Ipopt::Number* values);
     /** Method to return the values of the Jacobian. */
-    virtual bool eval_jac_g(int n, const Eigen::VectorXd &x, bool new_x,
-                            int m, Eigen::MatrixRXd &values) = 0;
+    virtual bool eval_jac_g(EConstVector x, bool new_x, EMatrix values) = 0;
     
     /** Method to return:
      *   1) The structure of the hessian of the lagrangian (if "values" is NULL)
@@ -84,9 +88,8 @@ public:
                         bool new_lambda, Ipopt::Index nele_hess, Ipopt::Index* iRow,
                         Ipopt::Index* jCol, Ipopt::Number* values);
     /** Method to return the values of the hessian of the lagrangian. */
-    virtual bool eval_h(int n, const Eigen::VectorXd &x, bool new_x,
-                        double obj_factor, int m, const Eigen::VectorXd &lambda,
-                        bool new_lambda, Eigen::MatrixRXd &values) = 0;
+    virtual bool eval_h(EConstVector x, bool new_x, double obj_factor,
+                        EConstVector lambda, bool new_lambda, EMatrix values) = 0;
     
     //@}
     
@@ -102,11 +105,9 @@ public:
     //@}
     /** This method is called when the algorithm is complete so the TNLP can store/write the solution */
     virtual void finalize_solution(Ipopt::SolverReturn status,
-                                   int n, const Eigen::VectorXd &x,
-                                   const Eigen::VectorXd &z_L, const Eigen::VectorXd &z_U,
-                                   int m, const Eigen::VectorXd &g, const Eigen::VectorXd &lambda,
-                                   double obj_value,
-                                   const Ipopt::IpoptData* ip_data,
+                                   EConstVector x, EConstVector z_L, EConstVector z_U,
+                                   EConstVector g, EConstVector lambda,
+                                   double obj_value, const Ipopt::IpoptData* ip_data,
                                    Ipopt::IpoptCalculatedQuantities* ip_cq) = 0;
     
 private:
@@ -126,6 +127,5 @@ private:
     TNLP_EigenDense& operator=(const TNLP_EigenDense&);
     //@}
 };
-
 
 #endif
