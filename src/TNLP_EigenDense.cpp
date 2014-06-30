@@ -9,6 +9,7 @@
 
 using namespace Ipopt;
 using namespace Eigen;
+using namespace std;
 
 // constructor
 TNLP_EigenDense::TNLP_EigenDense()
@@ -26,9 +27,11 @@ bool TNLP_EigenDense::get_nlp_info(Index& n, Index& m, Index& nnz_jac_g,
     // assume Jacobian is dense
     nnz_jac_g = n*m;
     // Hessian is also dense
-    nnz_h_lag = n*n;
+    nnz_h_lag = n*(n+1)*0.5;
     // use the C style indexing (0-based)
     index_style = TNLP::C_STYLE;
+    // resize temporary matrix for the hessian
+    H.resize(n,n);
     return res;
 }
 
@@ -121,10 +124,8 @@ bool TNLP_EigenDense::eval_h(Index n, const Number* x, bool new_x,
         // return the structure. This is a symmetric matrix, fill the lower left
         // triangle only. Assume the hessian is dense
         Index idx=0;
-        for (Index row = 0; row < n; row++)
-        {
-            for (Index col = 0; col < n; col++)
-            {
+        for (Index row = 0; row < n; row++){
+            for (Index col = 0; col <= row; col++){
                 iRow[idx] = row;
                 jCol[idx] = col;
                 idx++;
@@ -136,11 +137,25 @@ bool TNLP_EigenDense::eval_h(Index n, const Number* x, bool new_x,
     
     const Map<const VectorXd> x_eig(x,n);
     const Map<const VectorXd> lambda_eig(lambda,m);
-
     // @todo "values" should be mapped into a lower triangular matrix
-    Map<MatrixRXd> values_eig(values,n,n);
+    // Map<MatrixRXd> values_eig(values,n,n);
+    //
     
-    return eval_h(x_eig, new_x, obj_factor, lambda_eig, new_lambda, values_eig);
+    bool res = eval_h(x_eig, new_x, obj_factor, lambda_eig, new_lambda, H);
+    
+    // Copy the Eigen Hessian into the ipopt matrix structure
+//    cout<<"Eigen hessian:\n";
+    Index idx=0;
+    for (Index row = 0; row < n; row++){
+        for (Index col = 0; col <= row; col++){
+            values[idx] = H(row,col);
+//            cout<< values[idx]<<" ";
+            idx++;
+        }
+//        cout<<endl;
+    }
+    
+    return res;
 }
 
 void TNLP_EigenDense::finalize_solution(SolverReturn status,

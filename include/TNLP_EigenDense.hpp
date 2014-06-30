@@ -15,14 +15,17 @@ namespace Eigen
 
 typedef Eigen::Ref<Eigen::VectorXd> EVector;
 typedef const Eigen::Ref<const Eigen::VectorXd>& EConstVector;
-typedef Eigen::Map<Eigen::MatrixRXd> EMatrix;
-typedef const Eigen::Map<const Eigen::MatrixRXd> EConstMatrix;
+typedef Eigen::Ref<Eigen::MatrixRXd> EMatrix;
+typedef const Eigen::Ref<const Eigen::MatrixRXd> EConstMatrix;
 
 /**
  *
  */
 class TNLP_EigenDense : public Ipopt::TNLP
 {
+private:
+    Eigen::MatrixRXd    H;  // temporary matrix for the Hessian
+    
 public:
     /** default constructor */
     TNLP_EigenDense();

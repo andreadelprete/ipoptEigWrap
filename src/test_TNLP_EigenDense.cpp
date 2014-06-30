@@ -10,7 +10,7 @@
 
 using namespace Ipopt;
 
-const bool TEST_EIGEN_WRAPPER = false;
+const bool TEST_EIGEN_WRAPPER = true;
 
 int main(int argv, char* argc[])
 {

@@ -12,6 +12,7 @@
 #include <iostream>
 
 using namespace Ipopt;
+using namespace std;
 
 // constructor
 HS071_NLP::HS071_NLP()
@@ -238,6 +239,16 @@ bool HS071_NLP::eval_h(Index n, const Number* x, bool new_x,
     values[5] += lambda[1] * 2; // 2,2
 
     values[9] += lambda[1] * 2; // 3,3
+      
+      cout<<"Hessian Ipopt:\n";
+      int el=0;
+      for(int i=0; i<n; i++){
+          for(int j=0; j<=i; j++){
+              cout<<values[el]<<" ";
+              el++;
+          }
+          cout<<endl;
+      }
   }
 
   return true;

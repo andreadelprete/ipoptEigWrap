@@ -9,6 +9,8 @@
 
 using namespace Ipopt;
 using namespace Eigen;
+using namespace std;
+
 /**************************************************************************
  **************************************************************************
                         TNLP_EigenDenseExample
@@ -36,7 +38,7 @@ bool TNLP_EigenDenseExample::get_nlp_info(int &n, int &m)
 
 /** Method to return the bounds for my problem */
 bool TNLP_EigenDenseExample::get_bounds_info(EVector x_l, EVector x_u,
-                                           EVector g_l, EVector g_u)
+                                             EVector g_l, EVector g_u)
 {
     // here, the n and m we gave IPOPT in get_nlp_info are passed back to us.
     // If desired, we could assert to make sure they are what we think they are.
