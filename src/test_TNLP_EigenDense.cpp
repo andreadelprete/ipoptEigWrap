@@ -3,7 +3,7 @@
 // Author: Andrea Del Prete     LAAS-CNRS    2014-06-24
 
 #include "IpIpoptApplication.hpp"
-#include "TNLP_EIgenDenseExample.hpp"
+#include "TNLP_EigenDenseExample.hpp"
 #include <hs071_nlp.hpp>
 
 #include <iostream>
